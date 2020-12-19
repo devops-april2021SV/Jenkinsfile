@@ -1,48 +1,25 @@
 pipeline {
     agent any
+    parameters{
+        choice(name:'VERSION', choices:['1','2','3'], description:'Version to run')
+    }
+
     stages {
-        stage('One') {
-                steps {
-                        echo 'Hi, this is Zulaikha from edureka'
-			
-                }
+        stage('Build') {
+            when{
+                expression {params.VERSION == '1'}
+            }
+            steps {
+                input('Do you want to proceed?')
+                echo 'This is the Build Step'
+            }
         }
-	    stage('Two'){
-		    
-		steps {
-			input('Do you want to proceed?')
-        }
-	    }
-        stage('Three') {
-                when {
-                        not {
-                                branch "master"
-                        }
-                }
-                steps {
-			echo "Hello"
-                        }
-        }
-        stage('Four') {
-                parallel {
-                        stage('Unit Test') {
-                                steps{
-                                        echo "Running the unit test..."
-                                }
-                        }
-                        stage('Integration test') {
-                        agent {
-                                docker {
-                                        reuseNode false
-					image 'ubuntu'
-                                        }
-			}
-				steps {
-					echo 'Running the integration test..'
-				}
-                               
-			}  }
+    }
+    post{
+        success{
+            echo 'The job ran successfully'
         }
     }
 }
+
 
