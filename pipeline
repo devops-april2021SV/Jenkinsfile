@@ -1,0 +1,72 @@
+pipeline {
+    agent any
+    environment {
+            NEW_VERSION = '1.0'
+            AWS_ACCESSKEY = ''
+            AWS_ACCESSSECRET = ''
+    }
+    tools{
+            maven  // works only when predefined
+            gradle
+    }
+    parameters {
+            string(name:'VERSON',defaultValue:'',description:'verion to deply on prod')
+            choice(name:'VERSION', choices:['1.1.0','1.20','1.3.0'],description:'')
+            booleanParam(name:'executeTests',defaultValue:true,description:'')
+    }
+    stages {
+        stage('One') {
+                steps {
+                        echo 'Hi, this is my Jenkins pipeline'
+                        echo "building version ${NEW_VERSION}" // passing an environment variable
+			
+                }
+        }
+	    stage('Two'){
+		    
+		steps {
+			"input('Do you want to proceed?')" // how to create user input
+        }
+	    }
+        stage('Three') {
+                when {
+                        not {
+                                branch "master"
+                                BRANCH_NAME == 'dev'
+                                params.executeTests
+                        }
+                }
+                steps {
+			echo "Hello"
+                        }
+        }
+        stage('Four') {
+                parallel {
+                        stage('Unit Test') {
+                                steps{
+                                        echo "Running the unit test..."
+                                }
+                        }
+                        stage('Integration test') {
+                        agent {
+                                docker {
+                                        reuseNode false
+					image 'ubuntu'
+                                        }
+			}
+				steps {
+					echo 'Running the integration test..'
+				}
+                               
+			}  }
+        }
+    }
+    post {
+        always {
+            //
+        }
+        success {
+            //
+        }
+    }
+}
