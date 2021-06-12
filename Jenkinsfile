@@ -6,14 +6,30 @@ pipeline {
 
     stages {
         stage('Build') {
-            when{
-                expression {params.VERSION == '1'}
+                when{
+                        expression {params.VERSION == '1'}
+                    }
+                steps {
+                        input('Do you want to proceed?')
+                        echo 'This is the Build Step'
+                    }
             }
-            steps {
-                input('Do you want to proceed?')
-                echo 'This is the Build Step'
+        stage('Test') { 
+                        when{
+                                expression {params.VERSION == '2'}
+                            }
+               steps {
+                        echo 'This is the TEST Step'
+                    }
             }
-        }
+        stage('Deploy') { 
+                        when{
+                                expression {params.VERSION == '3'}
+                            }
+                steps {
+                         echo 'This is the DEPLOY Step'
+                    }
+            }
     }
     post{
         success{
